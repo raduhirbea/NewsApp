@@ -1,6 +1,7 @@
 package dev.raduhs.newsapp.ui
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Scaffold
@@ -16,6 +17,7 @@ import androidx.navigation.navArgument
 import dev.raduhs.newsapp.BottomMenuScreen
 import dev.raduhs.newsapp.MockData
 import dev.raduhs.newsapp.components.BottomMenu
+import dev.raduhs.newsapp.network.NewsManager
 import dev.raduhs.newsapp.ui.screen.Categories
 import dev.raduhs.newsapp.ui.screen.DetailScreen
 import dev.raduhs.newsapp.ui.screen.Sources
@@ -39,7 +41,10 @@ fun MainScreen(navController: NavHostController, scrollState: ScrollState) {
 }
 
 @Composable
-fun Navigation(navController: NavHostController, scrollState: ScrollState) {
+fun Navigation(navController: NavHostController, scrollState: ScrollState, newsManager: NewsManager = NewsManager()) {
+
+    val articles = newsManager.newsResponse.value.articles
+    Log.d("news", "$articles")
 
     NavHost(navController = navController, startDestination = "TopNews") {
         bottomNavigation(navController)

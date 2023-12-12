@@ -50,12 +50,17 @@ android {
 }
 
 dependencies {
-    val nav_version = "2.7.5"
 
     // Jetpack Compose Integration
-    implementation("androidx.navigation:navigation-compose:$nav_version")
-    implementation("androidx.compose.material:material-icons-extended-android:1.5.4")
-    implementation("androidx.compose.material:material:1.5.4")
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.material.icons.extended.android)
+    implementation(libs.androidx.material)
+
+    //retrofit
+    implementation(libs.retrofit)
+    implementation(libs.moshi.kotlin)
+    implementation(libs.converter.moshi)
+
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
