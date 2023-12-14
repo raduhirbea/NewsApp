@@ -51,7 +51,7 @@ fun Navigation(navController: NavHostController, scrollState: ScrollState, newsM
     Log.d("news", "$articles")
     articles?.let {
         NavHost(navController = navController, startDestination = BottomMenuScreen.TopNews.route, modifier = Modifier.padding(paddingValues = paddingValues)) {
-            bottomNavigation(navController, articles)
+            bottomNavigation(navController, articles, newsManager)
 
 /*            composable("TopNews") {
                 TopNews(navController = navController, articles)
@@ -74,12 +74,14 @@ fun Navigation(navController: NavHostController, scrollState: ScrollState, newsM
 
 }
 
-fun NavGraphBuilder.bottomNavigation(navController: NavHostController, articles: List<TopNewsArticle>) {
+fun NavGraphBuilder.bottomNavigation(navController: NavHostController, articles: List<TopNewsArticle>, newsManager: NewsManager) {
     composable(BottomMenuScreen.TopNews.route) {
         TopNews(navController = navController, articles)
     }
     composable(BottomMenuScreen.Categories.route) {
-        Categories()
+        Categories(newsManager = newsManager, onFetchCategory = {
+            newsManager.onSelectedCategoryChanged(it)
+        })
     }
     composable(BottomMenuScreen.Sources.route) {
         Sources()
