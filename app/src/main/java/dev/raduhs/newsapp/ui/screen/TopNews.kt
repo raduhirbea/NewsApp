@@ -18,27 +18,31 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.skydoves.landscapist.coil.CoilImage
 import dev.raduhs.newsapp.MockData
 import dev.raduhs.newsapp.MockData.getTimeAgo
 import dev.raduhs.newsapp.NewsData
 import dev.raduhs.newsapp.R
+import dev.raduhs.newsapp.models.TopNewsArticle
 
 @Composable
-fun TopNews(navController: NavController) {
+fun TopNews(navController: NavController, articles:List<TopNewsArticle>) {
     Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
 
         Text(text = "Top News", fontWeight = FontWeight.SemiBold)
         LazyColumn {
-            items(MockData.topNewsList) { newsData ->
-                TopNewsItem(newsData = newsData, onNewsClick = {
-                    navController.navigate("Detail/${newsData.id}")
+            items(articles.size) { index ->
+                TopNewsItem(article = articles[index], onNewsClick = {
+                    navController.navigate("Detail/${index}")
                 })
             }
         }
@@ -46,7 +50,7 @@ fun TopNews(navController: NavController) {
 }
 
 @Composable
-fun TopNewsItem(newsData: NewsData, onNewsClick: () -> Unit = {}) {
+fun TopNewsItem(article: TopNewsArticle, onNewsClick: () -> Unit = {}) {
 
     Box(
         modifier = Modifier
@@ -56,10 +60,12 @@ fun TopNewsItem(newsData: NewsData, onNewsClick: () -> Unit = {}) {
                 onNewsClick()
             }
     ) {
-        Image(
-            painter = painterResource(id = newsData.image),
+        CoilImage(
+            imageModel= article.urlToImage,
             contentDescription = "",
-            contentScale = ContentScale.FillBounds
+            contentScale = ContentScale.Crop,
+            error = ImageBitmap.imageResource(R.drawable.breaking_news),
+            placeHolder = ImageBitmap.imageResource(R.drawable.breaking_news),
         )
         Column(
             modifier = Modifier
@@ -68,7 +74,7 @@ fun TopNewsItem(newsData: NewsData, onNewsClick: () -> Unit = {}) {
             verticalArrangement = Arrangement.SpaceBetween
         ) {
 
-            MockData.stringToDate(newsData.publishedAt)?.let {
+            MockData.stringToDate(article.publishedAt!!)?.let {
                 Text(
                     text = it.getTimeAgo(),
                     color = Color.White,
@@ -76,25 +82,22 @@ fun TopNewsItem(newsData: NewsData, onNewsClick: () -> Unit = {}) {
                 )
             }
             Spacer(modifier = Modifier.height(80.dp))
-            Text(text = newsData.title, color = Color.White, fontWeight = FontWeight.SemiBold)
+            Text(text = article.title!!, color = Color.White, fontWeight = FontWeight.SemiBold)
 
         }
     }
 }
 
-@Preview(showBackground = true)
+/*@Preview(showBackground = true)
 @Composable
 fun TopNewsPreview() {
-    TopNews(rememberNavController())
-}
+    TopNews(rememberNavController(),)
+}*/
 
 @Preview(showBackground = true)
 @Composable
 fun TopNewsItemPreview() {
-    TopNewsItem(
-        newsData = NewsData(
-            2,
-            R.drawable.reuters,
+    TopNewsItem(TopNewsArticle(
             author = "Namita Singh",
             title = "Cleo Smith news — live: Kidnap suspect 'in hospital again' as 'hard police grind' credited for breakthrough - The Independent",
             description = "The suspected kidnapper of four-year-old Cleo Smith has been treated in hospital for a second time amid reports he was “attacked” while in custody.",

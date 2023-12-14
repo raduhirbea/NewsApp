@@ -3,9 +3,12 @@ package dev.raduhs.newsapp.ui
 import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -17,6 +20,7 @@ import androidx.navigation.navArgument
 import dev.raduhs.newsapp.BottomMenuScreen
 import dev.raduhs.newsapp.MockData
 import dev.raduhs.newsapp.components.BottomMenu
+import dev.raduhs.newsapp.models.TopNewsArticle
 import dev.raduhs.newsapp.network.NewsManager
 import dev.raduhs.newsapp.ui.screen.Categories
 import dev.raduhs.newsapp.ui.screen.DetailScreen
@@ -36,36 +40,43 @@ fun NewsApp() {
 fun MainScreen(navController: NavHostController, scrollState: ScrollState) {
 
     Scaffold(bottomBar = { BottomMenu(navController = navController)}) {
-        Navigation(navController, scrollState)
+        Navigation(navController, scrollState, paddingValues = it)
     }
 }
 
 @Composable
-fun Navigation(navController: NavHostController, scrollState: ScrollState, newsManager: NewsManager = NewsManager()) {
+fun Navigation(navController: NavHostController, scrollState: ScrollState, newsManager: NewsManager = NewsManager(), paddingValues: PaddingValues) {
 
     val articles = newsManager.newsResponse.value.articles
     Log.d("news", "$articles")
+    articles?.let {
+        NavHost(navController = navController, startDestination = BottomMenuScreen.TopNews.route, modifier = Modifier.padding(paddingValues = paddingValues)) {
+            bottomNavigation(navController, articles)
 
-    NavHost(navController = navController, startDestination = "TopNews") {
-        bottomNavigation(navController)
-        composable("TopNews") {
-            TopNews(navController = navController)
-        }
+/*            composable("TopNews") {
+                TopNews(navController = navController, articles)
+            }*/
 
-        composable("Detail/{newsId}",
-            arguments = listOf(navArgument("newsId"){type= NavType.IntType})
-        ) {
-            navBackStackEntry ->
-            val id = navBackStackEntry.arguments?.getInt("newsId")
-            val newsData = MockData.getNews(id)
-            DetailScreen(navController = navController, newsData, scrollState = scrollState)
+            composable("Detail/{index}",
+                arguments = listOf(navArgument("index"){type= NavType.IntType})
+            ) {
+                    navBackStackEntry ->
+                val index = navBackStackEntry.arguments?.getInt("index")
+                index?.let {
+                    val article = articles[index]
+                    DetailScreen(navController = navController, article, scrollState = scrollState)
+                }
+
+            }
         }
     }
+
+
 }
 
-fun NavGraphBuilder.bottomNavigation(navController: NavHostController) {
+fun NavGraphBuilder.bottomNavigation(navController: NavHostController, articles: List<TopNewsArticle>) {
     composable(BottomMenuScreen.TopNews.route) {
-        TopNews(navController = navController)
+        TopNews(navController = navController, articles)
     }
     composable(BottomMenuScreen.Categories.route) {
         Categories()
