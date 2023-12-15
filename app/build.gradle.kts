@@ -61,8 +61,10 @@ dependencies {
     implementation(libs.moshi.kotlin)
     implementation(libs.converter.moshi)
 
+    //coil
     implementation(libs.landscapist.coil)
 
+    implementation(libs.okhttp3.logging.interceptor)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
