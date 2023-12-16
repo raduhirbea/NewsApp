@@ -15,6 +15,8 @@ import retrofit2.Response
 
 class NewsManager {
 
+    val sourceName = mutableStateOf("abc-news")
+
     private val _newsResponse = mutableStateOf(TopNewsResponse())
     val newsResponse: State<TopNewsResponse>
         @Composable get() = remember {
@@ -28,6 +30,12 @@ class NewsManager {
         }
 
     val selectedCategory : MutableState<ArticleCategory?> = mutableStateOf(null)
+
+    private val _getArticlesBySource = mutableStateOf(TopNewsResponse())
+    val getArticleBySource: MutableState<TopNewsResponse>
+        @Composable get() = remember {
+            _getArticlesBySource
+        }
 
 
     init {
@@ -73,6 +81,29 @@ class NewsManager {
                 if (response.isSuccessful) {
                     _getArticleByCategoryResponse.value= response.body()!!
                     Log.d("category", "${_getArticleByCategoryResponse.value}")
+                } else {
+                    Log.d("error", "${response.errorBody()}")
+                }
+            }
+
+            override fun onFailure(call: Call<TopNewsResponse>, t: Throwable) {
+                Log.d("error", "${t.printStackTrace()}")
+            }
+
+        })
+    }
+
+    fun getArticlesBySource() {
+        val service = Api.retrofitService.getArticlesBySource(sourceName.value)
+        service.enqueue(object : Callback<TopNewsResponse> {
+
+            override fun onResponse(
+                call: Call<TopNewsResponse>,
+                response: Response<TopNewsResponse>
+            ) {
+                if (response.isSuccessful) {
+                    _getArticlesBySource.value= response.body()!!
+                    Log.d("source", "${_getArticlesBySource.value}")
                 } else {
                     Log.d("error", "${response.errorBody()}")
                 }
