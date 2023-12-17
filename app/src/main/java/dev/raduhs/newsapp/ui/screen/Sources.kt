@@ -68,7 +68,9 @@ fun Sources(newsManager: NewsManager) {
             MaterialTheme(shapes = MaterialTheme.shapes.copy(medium = RoundedCornerShape(16.dp))) {
                 DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
                     items.forEach {
-                        DropdownMenuItem(text = { it.first }, onClick = {
+                        DropdownMenuItem(text = {
+                            Text(it.first)
+                        }, onClick = {
                             newsManager.sourceName.value = it.second
                             menuExpanded = false
                         })
@@ -137,14 +139,17 @@ fun SourceContent(articles: List<TopNewsArticle>) {
                         elevation = 6.dp,
                     ) {
 
-                        ClickableText(text = annotatedString, modifier = Modifier.padding(8.dp), onClick = {
-                            annotatedString.getStringAnnotations(it, it).firstOrNull()
-                                ?.let { result ->
-                                    if (result.tag == "URL") {
-                                        uriHandler.openUri(result.item)
+                        ClickableText(
+                            text = annotatedString,
+                            modifier = Modifier.padding(8.dp),
+                            onClick = {
+                                annotatedString.getStringAnnotations(it, it).firstOrNull()
+                                    ?.let { result ->
+                                        if (result.tag == "URL") {
+                                            uriHandler.openUri(result.item)
+                                        }
                                     }
-                                }
-                        })
+                            })
                     }
                 }
             }
