@@ -33,9 +33,10 @@ import dev.raduhs.newsapp.R
 import dev.raduhs.newsapp.models.TopNewsArticle
 import dev.raduhs.newsapp.models.getAllArticleCategory
 import dev.raduhs.newsapp.network.NewsManager
+import dev.raduhs.newsapp.ui.MainViewModel
 
 @Composable
-fun Categories(onFetchCategory: (String) -> Unit, newsManager: NewsManager) {
+fun Categories(onFetchCategory: (String) -> Unit, viewModel: MainViewModel) {
     Text(text = "Categories Screen")
 
     val tabItems = getAllArticleCategory()
@@ -46,11 +47,11 @@ fun Categories(onFetchCategory: (String) -> Unit, newsManager: NewsManager) {
                 CategoryTab(
                     category = category.categoryName,
                     onFetchCategory = onFetchCategory,
-                    isSelected = newsManager.selectedCategory.value == category
+                    isSelected = viewModel.selectedCategory.value == category
                 )
             }
         }
-        ArticleContent(articles = newsManager.getArticleByCategoryResponse.value.articles ?: listOf())
+        ArticleContent(articles = viewModel.getArticleByCategoryResponse.value.articles ?: listOf())
     }
 }
 
