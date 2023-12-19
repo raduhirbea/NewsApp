@@ -22,6 +22,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,11 +42,12 @@ import dev.raduhs.newsapp.MockData.getTimeAgo
 import dev.raduhs.newsapp.R
 import dev.raduhs.newsapp.models.TopNewsArticle
 import dev.raduhs.newsapp.network.NewsManager
+import dev.raduhs.newsapp.ui.MainViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Sources(newsManager: NewsManager) {
+fun Sources(viewModel: MainViewModel) {
     val items = listOf(
         "TechCrunch" to "techcrunch",
         "TalkSport" to "talksport",
@@ -57,7 +59,7 @@ fun Sources(newsManager: NewsManager) {
 
     Scaffold(topBar = {
         TopAppBar(title = {
-            Text(text = "${newsManager.sourceName.value} Source")
+            Text(text = "${viewModel.sourceName.collectAsState().value} Source")
         }, actions = {
             var menuExpanded by remember {
                 mutableStateOf(false)
@@ -71,7 +73,8 @@ fun Sources(newsManager: NewsManager) {
                         DropdownMenuItem(text = {
                             Text(it.first)
                         }, onClick = {
-                            newsManager.sourceName.value = it.second
+                            viewModel.sourceName.value = it.second
+                            viewModel.getArticlesBySource()
                             menuExpanded = false
                         })
                     }
@@ -82,8 +85,8 @@ fun Sources(newsManager: NewsManager) {
         })
 
     }) {
-        newsManager.getArticlesBySource()
-        val articles = newsManager.getArticleBySource.value
+        viewModel.getArticlesBySource()
+        val articles = viewModel.getArticlesBySource.collectAsState().value
         SourceContent(articles = articles.articles ?: listOf())
 
 

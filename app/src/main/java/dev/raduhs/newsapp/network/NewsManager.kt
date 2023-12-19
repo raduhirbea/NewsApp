@@ -7,6 +7,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import dev.raduhs.newsapp.models.ArticleCategory
+import dev.raduhs.newsapp.models.Source
 import dev.raduhs.newsapp.models.TopNewsResponse
 import dev.raduhs.newsapp.models.getArticleCategory
 import kotlinx.coroutines.Dispatchers
@@ -53,54 +54,18 @@ class NewsManager(private val service: NewsService) {
         selectedCategory.value = newCategory
     }
 
-     suspend fun getArticlesByCategory(category: String) : TopNewsResponse =
-         withContext(Dispatchers.IO) {
-             service.getArticlesByCategory(category)
-         }
+    suspend fun getArticlesByCategory(category: String): TopNewsResponse =
+        withContext(Dispatchers.IO) {
+            service.getArticlesByCategory(category)
+        }
 
-    fun getArticlesBySource() {
-        val service = Api.retrofitService.getArticlesBySource(sourceName.value)
-        service.enqueue(object : Callback<TopNewsResponse> {
+    suspend fun getArticlesBySource(source: String): TopNewsResponse =
+        withContext(Dispatchers.IO) {
+            service.getArticlesBySource(source)
+        }
 
-            override fun onResponse(
-                call: Call<TopNewsResponse>,
-                response: Response<TopNewsResponse>
-            ) {
-                if (response.isSuccessful) {
-                    _getArticlesBySource.value= response.body()!!
-                    Log.d("source", "${_getArticlesBySource.value}")
-                } else {
-                    Log.d("error", "${response.errorBody()}")
-                }
-            }
-
-            override fun onFailure(call: Call<TopNewsResponse>, t: Throwable) {
-                Log.d("error", "${t.printStackTrace()}")
-            }
-
-        })
-    }
-
-    fun getSearchedArticles(query:String) {
-        val service = Api.retrofitService.getArticles(query)
-        service.enqueue(object : Callback<TopNewsResponse> {
-
-            override fun onResponse(
-                call: Call<TopNewsResponse>,
-                response: Response<TopNewsResponse>
-            ) {
-                if (response.isSuccessful) {
-                    _searchedNewsResponse.value= response.body()!!
-                    Log.d("search", "${_searchedNewsResponse.value}")
-                } else {
-                    Log.d("search", "${response.errorBody()}")
-                }
-            }
-
-            override fun onFailure(call: Call<TopNewsResponse>, t: Throwable) {
-                Log.d("search error", "${t.printStackTrace()}")
-            }
-
-        })
-    }
+    suspend fun getSearchedArticles(query:String) : TopNewsResponse =
+        withContext(Dispatchers.IO) {
+            service.getArticles(query)
+        }
 }

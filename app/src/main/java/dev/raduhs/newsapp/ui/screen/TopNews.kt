@@ -16,6 +16,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,16 +37,17 @@ import dev.raduhs.newsapp.R
 import dev.raduhs.newsapp.components.SearchBar
 import dev.raduhs.newsapp.models.TopNewsArticle
 import dev.raduhs.newsapp.network.NewsManager
+import dev.raduhs.newsapp.ui.MainViewModel
 
 @Composable
-fun TopNews(navController: NavController, articles:List<TopNewsArticle>, query:MutableState<String>, newsManager: NewsManager) {
+fun TopNews(navController: NavController, articles:List<TopNewsArticle>, query:MutableState<String>, viewModel: MainViewModel) {
     Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
 
-        SearchBar(query = query, newsManager = newsManager)
+        SearchBar(query = query, viewModel)
         val searchedText = query.value
         val resultList = mutableListOf<TopNewsArticle>()
         if (searchedText != "") {
-            resultList.addAll(newsManager.searchedNewsResponse.value.articles?:articles)
+            resultList.addAll(viewModel.searchedNewsResponse.collectAsState().value.articles?:articles)
         } else {
             resultList.addAll(articles)
         }

@@ -57,4 +57,29 @@ class MainViewModel(application: Application): AndroidViewModel(application) {
         _selectedCategory.value = newCategory
     }
 
+    val sourceName = MutableStateFlow("engadget")
+    private val _getArticlesBySource = MutableStateFlow(TopNewsResponse())
+    val getArticlesBySource: StateFlow<TopNewsResponse>
+        get() = _getArticlesBySource
+
+    val query = MutableStateFlow("")
+    private val _searchedNewsResponse = MutableStateFlow(TopNewsResponse())
+    val searchedNewsResponse: StateFlow<TopNewsResponse>
+        get() = _searchedNewsResponse
+
+    fun getArticlesBySource() {
+        _isLoading.value = true
+        viewModelScope.launch(Dispatchers.IO) {
+            _getArticlesBySource.value = repository.getArticlesBySource(sourceName.value)
+            _isLoading.value = false
+        }
+    }
+
+    fun getSearchedArticles(query:String) {
+        _isLoading.value = true
+        viewModelScope.launch(Dispatchers.IO) {
+            _searchedNewsResponse.value = repository.getSearchedArticles(query)
+            _isLoading.value = false
+        }
+    }
 }
