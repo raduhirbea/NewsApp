@@ -22,6 +22,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,6 +41,8 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import dev.raduhs.newsapp.MockData.getTimeAgo
 import dev.raduhs.newsapp.R
+import dev.raduhs.newsapp.components.ErrorUI
+import dev.raduhs.newsapp.components.LoadingUI
 import dev.raduhs.newsapp.models.TopNewsArticle
 import dev.raduhs.newsapp.network.NewsManager
 import dev.raduhs.newsapp.ui.MainViewModel
@@ -47,7 +50,8 @@ import dev.raduhs.newsapp.ui.MainViewModel
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Sources(viewModel: MainViewModel) {
+fun Sources(viewModel: MainViewModel, isLoading: MutableState<Boolean>,
+            isError: MutableState<Boolean>) {
     val items = listOf(
         "TechCrunch" to "techcrunch",
         "TalkSport" to "talksport",
@@ -85,9 +89,19 @@ fun Sources(viewModel: MainViewModel) {
         })
 
     }) {
-        viewModel.getArticlesBySource()
-        val articles = viewModel.getArticlesBySource.collectAsState().value
-        SourceContent(articles = articles.articles ?: listOf())
+        when {
+            isLoading.value -> {
+                LoadingUI()
+            }
+            isError.value -> {
+                ErrorUI()
+            }
+            else -> {
+                viewModel.getArticlesBySource()
+                val articles = viewModel.getArticlesBySource.collectAsState().value
+                SourceContent(articles = articles.articles ?: listOf())
+            }
+        }
 
 
     }

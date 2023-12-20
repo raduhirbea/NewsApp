@@ -34,29 +34,50 @@ import dev.raduhs.newsapp.MockData
 import dev.raduhs.newsapp.MockData.getTimeAgo
 import dev.raduhs.newsapp.NewsData
 import dev.raduhs.newsapp.R
+import dev.raduhs.newsapp.components.ErrorUI
+import dev.raduhs.newsapp.components.LoadingUI
 import dev.raduhs.newsapp.components.SearchBar
 import dev.raduhs.newsapp.models.TopNewsArticle
 import dev.raduhs.newsapp.network.NewsManager
 import dev.raduhs.newsapp.ui.MainViewModel
 
 @Composable
-fun TopNews(navController: NavController, articles:List<TopNewsArticle>, query:MutableState<String>, viewModel: MainViewModel) {
+fun TopNews(
+    navController: NavController,
+    articles: List<TopNewsArticle>,
+    query: MutableState<String>,
+    viewModel: MainViewModel,
+    isLoading: MutableState<Boolean>,
+    isError: MutableState<Boolean>
+) {
     Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
 
         SearchBar(query = query, viewModel)
         val searchedText = query.value
         val resultList = mutableListOf<TopNewsArticle>()
         if (searchedText != "") {
-            resultList.addAll(viewModel.searchedNewsResponse.collectAsState().value.articles?:articles)
+            resultList.addAll(
+                viewModel.searchedNewsResponse.collectAsState().value.articles ?: articles
+            )
         } else {
             resultList.addAll(articles)
         }
 
-        LazyColumn {
-            items(resultList.size) { index ->
-                TopNewsItem(article = resultList[index], onNewsClick = {
-                    navController.navigate("Detail/${index}")
-                })
+        when {
+            isLoading.value -> {
+                LoadingUI()
+            }
+            isError.value -> {
+                ErrorUI()
+            }
+            else -> {
+                LazyColumn {
+                    items(resultList.size) { index ->
+                        TopNewsItem(article = resultList[index], onNewsClick = {
+                            navController.navigate("Detail/${index}")
+                        })
+                    }
+                }
             }
         }
     }
@@ -74,7 +95,7 @@ fun TopNewsItem(article: TopNewsArticle, onNewsClick: () -> Unit = {}) {
             }
     ) {
         CoilImage(
-            imageModel= article.urlToImage,
+            imageModel = article.urlToImage,
             contentDescription = "",
             contentScale = ContentScale.Crop,
             error = ImageBitmap.imageResource(R.drawable.breaking_news),
@@ -111,7 +132,8 @@ fun TopNewsItem(article: TopNewsArticle, onNewsClick: () -> Unit = {}) {
 @Preview(showBackground = true)
 @Composable
 fun TopNewsItemPreview() {
-    TopNewsItem(TopNewsArticle(
+    TopNewsItem(
+        TopNewsArticle(
             author = "Namita Singh",
             title = "Cleo Smith news — live: Kidnap suspect 'in hospital again' as 'hard police grind' credited for breakthrough - The Independent",
             description = "The suspected kidnapper of four-year-old Cleo Smith has been treated in hospital for a second time amid reports he was “attacked” while in custody.",
